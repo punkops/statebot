@@ -4,7 +4,7 @@ from statebot.skeleton import fib, main
 
 __author__ = "Nick Syntychakis"
 __copyright__ = "Nick Syntychakis"
-__license__ = "MIT"
+__license__ = "Apache-2.0"
 
 
 def test_fib():
