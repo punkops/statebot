@@ -29,7 +29,7 @@ def setup_logging(loglevel):
 
 
 def main():
-    parser = argparse.ArgumentParser(prog='my_script', description='My Script')
+    parser = argparse.ArgumentParser(prog="my_script", description="My Script")
     parser.add_argument(
         "--version",
         action="version",
@@ -52,19 +52,19 @@ def main():
         const=logging.DEBUG,
     )
 
-    subparsers = parser.add_subparsers(title='subcommands', dest='subcommand')
+    subparsers = parser.add_subparsers(title="subcommands", dest="subcommand")
 
     # Create subparser for aws command
-    parser_aws = subparsers.add_parser('aws', help='Run aws command')
+    parser_aws = subparsers.add_parser("aws", help="Run aws command")
     parser_aws.set_defaults(func=aws)
 
     args = parser.parse_args()
     setup_logging(args.loglevel)
-    if hasattr(args, 'func'):
+    if hasattr(args, "func"):
         args.func(args)
     else:
         parser.print_help()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
