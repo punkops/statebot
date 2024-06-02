@@ -1,55 +1,85 @@
-##
-## This Source Code Form is subject to the terms of the Mozilla Public
-## License, v. 2.0. If a copy of the MPL was not distributed with this
-## file, You can obtain one at https://mozilla.org/MPL/2.0/.
-##
-exclude: "^docs/conf.py"
-
+default_install_hook_types:
+  - post-checkout
+  - post-merge
+  - pre-push
+default_stages:
+  - manual
+  - pre-push
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
-      - id: trailing-whitespace
       - id: check-added-large-files
-      - id: check-ast
-      - id: check-json
+      - id: check-docstring-first
       - id: check-merge-conflict
+        args:
+          - '--assume-in-merge'
+      - id: check-toml
       - id: check-xml
       - id: check-yaml
-      - id: debug-statements
       - id: end-of-file-fixer
-      - id: requirements-txt-fixer
+      - id: forbid-new-submodules
       - id: mixed-line-ending
-        args: ["--fix=auto"] # replace 'auto' with 'lf' to enforce Linux/Mac line endings or 'crlf' for Windows
-
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+      - id: name-tests-test
+      - id: no-commit-to-branch
+        stages:
+          - pre-push
+      - id: sort-simple-yaml
+        files: .pre-commit-config.yaml
+      - id: trailing-whitespace
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 37.368.8
     hooks:
-      - id: isort
-
-  - repo: https://github.com/psf/black
-    rev: 24.4.2
+      - id: renovate-config-validator
+  - repo: local
     hooks:
-      - id: black
-        language_version: python3
-
-  - repo: https://github.com/PyCQA/flake8
-    rev: 7.0.0
-    hooks:
-      - id: flake8
-        # P103 - disallows "{}" in strings
-        # E203 - ":" with whitespace before it
-        # E501 - line length (black will handle most of the issues, and what it can't - should be ingored)
-        args: ["-j8", "--ignore=E203,E501,P103"]
-        additional_dependencies:
-          - flake8-broken-line
-          - flake8-bugbear
-          - flake8-comprehensions
-          - flake8-debugger
-          - flake8-string-format
-
-  - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.5
-    hooks:
-      - id: forbid-crlf
-      - id: remove-crlf
+      - id: pdm-sync
+        name: pdm-sync
+        entry: pdm sync
+        language: python
+        stages:
+          - post-checkout
+          - post-merge
+        always_run: true
+        pass_filenames: false
+      - id: pdm-lock-check
+        name: pdm-lock-check
+        entry: pdm lock --check
+        language: python
+        files: ^pyproject.toml$
+        pass_filenames: false
+      - id: mypy
+        name: mypy
+        entry: pdm run python -m mypy
+        language: system
+        types_or:
+          - python
+          - pyi
+        require_serial: true
+      - id: ruff
+        name: ruff
+        entry: pdm run python -m ruff check --force-exclude
+        language: system
+        types_or:
+          - python
+          - pyi
+        require_serial: true
+      - id: ruff-format
+        name: ruff-format
+        entry: pdm run python -m ruff format --force-exclude
+        language: system
+        types_or:
+          - python
+          - pyi
+        require_serial: true
+      - id: toml-sort
+        name: toml-sort
+        entry: pdm run toml-sort
+        language: system
+        types:
+          - toml
+      - id: forbidden-files
+        name: forbidden files
+        entry: found Copier update rejection files; review them and remove them
+        language: fail
+        files: \.rej$
